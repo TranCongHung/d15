@@ -140,4 +140,76 @@ class RegisterController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Xử lý yêu cầu đăng nhập qua Form (POST).
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function login(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => ['required', 'email'],
+                'password' => ['required'],
+            ]);
+
+            $credentials = $request->only('email', 'password');
+
+            if (Auth::attempt($credentials, $request->has('remember'))) {
+                $request->session()->regenerate();
+                $user = Auth::user();
+                $redirectTo = $this->getRedirectUrlByRole($user);
+                return redirect()->to($redirectTo);
+            }
+
+            return back()->withErrors([
+                'email' => 'Email hoặc mật khẩu không chính xác.',
+            ])->onlyInput('email');
+
+        } catch (ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            Log::error("Login Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
+            return redirect()->back()->with('error', 'Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.');
+        }
+    }
+
+    /**
+     * Xử lý yêu cầu đăng ký qua Form (POST).
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function register(Request $request)
+    {
+        try {
+            $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'phone' => ['required', 'string', 'max:20', 'unique:users'],
+            ]);
+
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => $request->password,
+                'phone' => $request->phone,
+                'role' => 'user',
+            ]);
+
+            Auth::login($user);
+
+            $redirectTo = $this->getRedirectUrlByRole($user);
+            return redirect()->to($redirectTo);
+
+        } catch (ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            Log::error("Registration Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
+            return redirect()->back()->with('error', 'Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.');
+        }
+    }
 }

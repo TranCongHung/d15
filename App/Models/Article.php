@@ -22,6 +22,17 @@ class Article extends Model
         'body', // Thêm body nếu bạn có trong migration
     ];
     
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($article) {
+            if (empty($article->slug)) {
+                $article->slug = Str::slug($article->title);
+            }
+        });
+    }
+
     // =========================================================
     // TẠO SLUG TỰ ĐỘNG (Mutator/Accessor)
     // =========================================================

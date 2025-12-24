@@ -27,7 +27,7 @@ class ComposerServiceProvider extends ServiceProvider
             $categories = Category::all();
             
             // Thêm mục "Trang Chủ" thủ công vào đầu Collection
-            $homeCategory = (object)['code' => 'ALL', 'name' => 'Trang Chủ'];
+            $homeCategory = new Category(['code' => 'ALL', 'name' => 'Trang Chủ']);
             
             // Thêm mục Trang Chủ vào đầu danh sách Categories
             $categories = collect([$homeCategory])->merge($categories);
