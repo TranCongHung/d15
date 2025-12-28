@@ -1,40 +1,52 @@
 @extends('layouts.app')
 
 @section('content')
-    {{-- Start: Hero Banner Section (Đoạn 1) --}}
-<section class="bg-black text-white">
+{{-- Start: Hero Banner Section --}}
+<section class="relative bg-gray-900 text-white overflow-hidden">
     
+    {{-- Background Image Overlay --}}
+    <div class="absolute inset-0 z-0">
+        {{-- Thay đường dẫn ảnh vào src bên dưới --}}
+        <img src="{{ asset('img/military-bg.jpg') }}"
+             alt="Military Background" 
+             class="w-full h-full object-cover object-center opacity-40"> {{-- Độ mờ ảnh 40% để nổi chữ --}}
+        
+        {{-- Gradient che phủ để làm tối phần dưới và đảm bảo độ tương phản --}}
+        <div class="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent"></div>
+    </div>
+
     {{-- Top Red Strip --}}
-    <div class="bg-military-red h-3"></div>
+    <div class="relative z-20 bg-[#880000] h-1.5"></div>
 
     {{-- Content Container --}}
-    <div class="container mx-auto px-4 py-16 lg:py-24">
+    <div class="container relative z-10 mx-auto px-6 py-20 lg:py-32">
         
         {{-- Metadata/Category Tag --}}
-        <div class="inline-block px-3 py-1 mb-6 bg-military-red text-white text-xs font-bold uppercase tracking-widest rounded-sm">
-            HẢI QUÂN
+        <div class="inline-block px-4 py-1.5 mb-8 bg-[#880000] text-white text-xs font-bold uppercase tracking-[0.2em] rounded-sm shadow-lg">
+           PHÁO BINH & SPG-9
         </div>
 
         {{-- Main Title --}}
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 max-w-4xl font-serif">
+        <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.1] mb-8 max-w-4xl font-serif italic tracking-tight">
             Việt Nam Tăng Cường Năng Lực Phòng Thủ Bờ Biển Với Hệ Thống Radar Mới
         </h1>
 
         {{-- Excerpt/Summary --}}
-        <p class="text-lg text-gray-300 mb-10 max-w-3xl">
+        <p class="text-lg md:text-xl text-gray-200 mb-12 max-w-2xl leading-relaxed font-serif italic">
             Hệ thống radar cảnh báo sớm thế hệ mới đã chính thức được triển khai tại các điểm trọng yếu, nâng cao đáng kể khả năng giám sát vùng biển.
         </p>
 
         {{-- Action Buttons --}}
-        <div class="flex space-x-4 items-center">
-            
+        <div class="flex space-x-6 items-center">
             {{-- Primary Button: ĐỌC CHI TIẾT --}}
-            <a href="#" class="flex items-center justify-center px-6 py-3 bg-military-red text-black font-bold uppercase tracking-wider text-sm transition-colors duration-200 hover:bg-red-700 hover:text-white rounded-sm">
+            <a href="{{ $latestArticles->first() ? route('articles.show', $latestArticles->first()->slug) : '#' }}" 
+               class="group flex items-center justify-center px-8 py-4 bg-[#880000] text-white font-bold uppercase tracking-widest text-sm transition-all duration-300 hover:bg-white hover:text-black shadow-xl">
                 ĐỌC CHI TIẾT
-                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-            </a>        
+                <svg class="w-5 h-5 ml-3 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </a>         
         </div>
-        
     </div>
 </section>
     <div class="container mx-auto px-4 py-12">
@@ -106,6 +118,7 @@
                         {{ $latestArticles->links() }}
                     </div>
                 @endif
+                
             </div>
 
             {{-- Vùng Sidebar (1/3) --}}

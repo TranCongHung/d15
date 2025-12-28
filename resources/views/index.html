@@ -1,0 +1,230 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lịch sử Sư đoàn 324 - Đoàn Ngự Bình</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <!-- Babel để chạy JSX trực tiếp trên trình duyệt -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@^19.2.3",
+      "react-dom/client": "https://esm.sh/react-dom@^19.2.3/client",
+      "recharts": "https://esm.sh/recharts@^3.6.0",
+      "xlsx": "https://esm.sh/xlsx@0.18.5"
+    }
+  }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .bg-324 { background-color: #b91c1c; }
+    .text-324 { color: #b91c1c; }
+    .border-324 { border-color: #b91c1c; }
+    .btn-324 { background-color: #b91c1c; color: white; transition: all 0.2s; }
+    .btn-324:hover { background-color: #991b1b; transform: translateY(-1px); }
+    .btn-324:active { transform: translateY(0); }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <div id="root"></div>
+
+  <script type="text/babel" data-type="module">
+    import React, { useState, useRef } from 'react';
+    import ReactDOM from 'react-dom/client';
+    import * as XLSX from 'xlsx';
+    import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+
+    // --- NGÂN HÀNG CÂU HỎI SƯ ĐOÀN 324 ---
+    const QUESTIONS_BANK = {
+      founding: [
+        { q: 'Sư đoàn 324 (Đoàn Ngự Bình) thành lập vào ngày tháng năm nào?', a: ['01/05/1954', '01/07/1955', '19/05/1959', '22/12/1944'], c: 1, e: 'Sư đoàn 324 thành lập ngày 01/07/1955 tại huyện Tĩnh Gia, tỉnh Thanh Hóa.' },
+        { q: 'Mật danh của Sư đoàn 324 là gì?', a: ['Đoàn Khe Sanh', 'Đoàn Ngự Bình', 'Đoàn Tây Sơn', 'Đoàn Đồng Lộc'], c: 1, e: 'Mật danh nổi tiếng của Sư đoàn là Đoàn Ngự Bình.' },
+        { q: 'Tiền thân của Sư đoàn 324 là đơn vị nào?', a: ['Chủ lực miền Bắc', 'Các đơn vị vũ trang Liên khu 5 tập kết', 'Dân quân Quảng Trị', 'Sư đoàn 308'], c: 1, e: 'Sư đoàn được hình thành từ các đơn vị vũ trang Liên khu 5 tập kết ra Bắc.' }
+      ],
+      battles: [
+        { q: 'Sư đoàn 324 gắn liền với chiến trường nào trong kháng chiến chống Mỹ?', a: ['Tây Bắc', 'Đông Nam Bộ', 'Trị Thiên - Đường 9', 'Miền Tây'], c: 2, e: 'Trị Thiên là chiến trường chính của Sư đoàn 324.' },
+        { q: 'Sư đoàn 324 đã giải phóng thành phố nào trong Xuân 1975?', a: ['Huế và Đà Nẵng', 'Buôn Ma Thuột', 'Sài Gòn', 'Nha Trang'], c: 0, e: 'Sư đoàn là đơn vị chủ lực giải phóng Huế và Đà Nẵng năm 1975.' }
+      ]
+    };
+
+    const App = () => {
+      const [view, setView] = useState('home');
+      const [questions, setQuestions] = useState([]);
+      const [currIdx, setCurrIdx] = useState(0);
+      const [results, setResults] = useState([]);
+      const fileInputRef = useRef(null);
+
+      const startQuiz = (key) => {
+        setQuestions(QUESTIONS_BANK[key]);
+        setCurrIdx(0);
+        setResults([]);
+        setView('quiz');
+      };
+
+      const handleAnswer = (idx) => {
+        const isCorrect = idx === questions[currIdx].c;
+        const newResults = [...results, { isCorrect, selected: idx }];
+        setResults(newResults);
+        
+        if (currIdx < questions.length - 1) {
+          setCurrIdx(currIdx + 1);
+        } else {
+          setView('result');
+        }
+      };
+
+      const handleExcel = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+          const qs = json.slice(1).map(r => ({
+            q: r[0], a: [r[1], r[2], r[3], r[4]], c: parseInt(r[5]), e: r[6]
+          })).filter(item => item.q);
+          setQuestions(qs);
+          setCurrIdx(0);
+          setResults([]);
+          setView('quiz');
+        };
+        reader.readAsArrayBuffer(file);
+      };
+
+      // GIAO DIỆN LÀM BÀI
+      if (view === 'quiz') return (
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl p-8 md:p-12 border border-slate-100">
+            <div className="flex justify-between items-center mb-10">
+              <span className="text-324 font-black uppercase tracking-widest text-sm">Câu {currIdx + 1} / {questions.length}</span>
+              <div className="h-2 w-24 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-full bg-324 transition-all" style={{ width: `${((currIdx+1)/questions.length)*100}%` }}></div>
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-800 mb-8 leading-snug">{questions[currIdx].q}</h2>
+            <div className="grid gap-4">
+              {questions[currIdx].a.map((opt, i) => (
+                <button key={i} onClick={() => handleAnswer(i)} className="p-5 text-left rounded-2xl border-2 border-slate-100 hover:border-324 hover:bg-red-50 transition-all group flex items-center">
+                  <span className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mr-4 font-bold group-hover:bg-324 group-hover:text-white transition-colors">{String.fromCharCode(65 + i)}</span>
+                  <span className="text-slate-700 font-medium">{opt}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+
+      // GIAO DIỆN KẾT QUẢ
+      if (view === 'result') {
+        const correctCount = results.filter(r => r.isCorrect).length;
+        const chartData = [{ name: 'Đúng', value: correctCount, color: '#10b981' }, { name: 'Sai', value: questions.length - correctCount, color: '#ef4444' }];
+        return (
+          <div className="min-h-screen p-4 py-12">
+            <div className="max-w-3xl mx-auto bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100">
+              <div className="bg-324 p-12 text-center text-white">
+                <h2 className="text-2xl font-bold opacity-80 mb-4">Kết Quả Kiểm Tra</h2>
+                <div className="text-8xl font-black mb-2">{Math.round(correctCount/questions.length*100)}%</div>
+                <p className="text-red-100 font-medium">Bạn đã trả lời đúng {correctCount} / {questions.length} câu</p>
+              </div>
+              <div className="p-8 md:p-12">
+                <div className="grid md:grid-cols-2 gap-8 items-center mb-12">
+                  <div className="h-48">
+                    <ResponsiveContainer>
+                      <PieChart>
+                        <Pie data={chartData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                          {chartData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="bg-slate-50 p-6 rounded-2xl italic text-slate-600">
+                    "{correctCount/questions.length >= 0.8 ? 'Xuất sắc! Bạn nắm rất vững lịch sử đơn vị.' : 'Bạn nên tìm hiểu thêm về truyền thống hào hùng của Sư đoàn.'}"
+                  </div>
+                </div>
+                <div className="space-y-4 mb-10">
+                  {questions.map((q, i) => (
+                    <div key={i} className={`p-6 rounded-2xl border-l-4 ${results[i].isCorrect ? 'bg-emerald-50 border-emerald-500' : 'bg-red-50 border-red-500'}`}>
+                      <p className="font-bold text-slate-800">{i + 1}. {q.q}</p>
+                      <p className="text-sm mt-2">Đáp án đúng: <span className="font-bold text-emerald-600">{q.a[q.c]}</span></p>
+                      <p className="text-xs text-slate-400 mt-2">Thông tin: {q.e}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-center">
+                  <button onClick={() => setView('home')} className="btn-324 px-10 py-4 rounded-2xl font-black uppercase tracking-widest">Quay lại trang chủ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // GIAO DIỆN TRANG CHỦ
+      return (
+        <div className="min-h-screen flex flex-col">
+          <nav className="h-16 bg-white border-b flex items-center px-8 justify-between sticky top-0 z-50">
+            <div className="flex items-center space-x-2 font-black text-xl text-slate-800">
+              <div className="w-8 h-8 bg-324 rounded-lg flex items-center justify-center text-white">324</div>
+              <span className="tracking-tighter uppercase">Sư đoàn 324</span>
+            </div>
+            <div className="hidden md:block text-xs font-bold text-red-600 bg-red-50 px-4 py-1.5 rounded-full">TRUYỀN THỐNG - ĐOÀN KẾT - CHIẾN THẮNG</div>
+          </nav>
+
+          <main className="flex-grow max-w-5xl mx-auto py-20 px-6">
+            <div className="text-center mb-16">
+              <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight">Tìm hiểu <span className="text-324">Đoàn Ngự Bình</span></h1>
+              <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">Hệ thống trắc nghiệm nội bộ ôn lại lịch sử hào hùng và truyền thống vẻ vang của Sư đoàn 324 qua các thời kỳ.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+              <div onClick={() => startQuiz('founding')} className="bg-white p-10 rounded-[3rem] border-2 border-slate-100 hover:border-324 shadow-sm hover:shadow-2xl transition-all cursor-pointer group text-center">
+                <div className="text-6xl mb-6 group-hover:scale-110 transition-transform">🎖️</div>
+                <h3 className="font-bold text-2xl mb-2">Ngày Thành Lập</h3>
+                <p className="text-slate-400">Giai đoạn hình thành đơn vị năm 1955.</p>
+              </div>
+              <div onClick={() => startQuiz('battles')} className="bg-white p-10 rounded-[3rem] border-2 border-slate-100 hover:border-324 shadow-sm hover:shadow-2xl transition-all cursor-pointer group text-center">
+                <div className="text-6xl mb-6 group-hover:scale-110 transition-transform">⚔️</div>
+                <h3 className="font-bold text-2xl mb-2">Chiến Công Hiển Hách</h3>
+                <p className="text-slate-400">Các chiến dịch lớn tại chiến trường Trị Thiên.</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-900 rounded-[3rem] p-12 text-center text-white shadow-2xl relative overflow-hidden">
+              <div className="relative z-10">
+                <h2 className="text-3xl font-bold mb-4">Tải lên bộ câu hỏi Excel</h2>
+                <p className="text-slate-400 mb-8 max-w-lg mx-auto">Bạn có file câu hỏi riêng? Hãy tải lên để tự kiểm tra kiến thức cho đơn vị của mình.</p>
+                <div className="flex flex-col sm:flex-row justify-center gap-4">
+                  <input type="file" ref={fileInputRef} onChange={handleExcel} accept=".xlsx" className="hidden" />
+                  <button onClick={() => fileInputRef.current.click()} className="btn-324 px-8 py-3 rounded-xl font-bold">Nạp file Excel</button>
+                  <button className="border border-slate-700 px-8 py-3 rounded-xl font-bold hover:bg-slate-800 transition-colors" onClick={() => {
+                    const data = [["Câu hỏi","A","B","C","D","Đáp án(0-3)","Giải thích"],["Sư đoàn 324 thành lập ở đâu?","Nghệ An","Thanh Hóa","Huế","Hà Nội",1,"Thành lập tại Tĩnh Gia, Thanh Hóa"]];
+                    const ws = XLSX.utils.aoa_to_sheet(data);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Quiz");
+                    XLSX.writeFile(wb, "Mau_Quiz_324.xlsx");
+                  }}>Tải file mẫu</button>
+                </div>
+              </div>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-324 opacity-10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            </div>
+          </main>
+
+          <footer className="py-10 text-center text-slate-400 text-sm border-t border-slate-100 bg-white">
+            <p>© 2024 Sư đoàn 324 - Quân khu 4</p>
+            <p className="mt-1 font-medium">Bản quyền thuộc về Phòng Chính trị Sư đoàn</p>
+          </footer>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

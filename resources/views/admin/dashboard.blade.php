@@ -4,9 +4,8 @@
                             <h2>Trung tâm Chỉ huy</h2>
                             <p>Báo cáo tổng hợp tình hình tác chiến điện tử và nội dung</p>
                         </div>
-                        <button class="btn-ai" id="btn-ai">
-                            <i data-lucide="sparkles"></i>
-                            <span id="btn-ai-text">Báo cáo thông minh (AI)</span>
+                        <button class="btn-ai" style="background: var(--army-600)" onclick="openCreateArticle()">
+                            <i data-lucide="plus"></i> Thêm bài mới
                         </button>
                     </div>
 

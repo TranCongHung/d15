@@ -27,6 +27,5 @@ class ArticleSeeder extends Seeder
             ->count(50) // Tạo 50 bài viết
             ->create();
     }
-}
+}// KHÔNG CÓ BẤT KỲ ĐỊNH NGHĨA CLASS NÀO KHÁC BÊN DƯỚI NÀY!
 
-// KHÔNG CÓ BẤT KỲ ĐỊNH NGHĨA CLASS NÀO KHÁC BÊN DƯỚI NÀY!
