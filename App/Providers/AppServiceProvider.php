@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,5 +21,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+        // Ép buộc HTTPS khi dùng Ngrok hoặc LocalTunnel để tránh lỗi giao diện/form
+        if (str_contains(request()->getHost(), 'ngrok') || str_contains(request()->getHost(), 'loca.lt')) {
+            URL::forceScheme('https');
+        }
     }
 }
