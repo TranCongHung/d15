@@ -7,7 +7,7 @@
     {{-- Background Image Overlay --}}
     <div class="absolute inset-0 z-0">
         {{-- Thay đường dẫn ảnh vào src bên dưới --}}
-        <img src="{{ asset('img/military-bg.jpg') }}"
+        <img src="{{ asset('img/banner web.jpg') }}"
              alt="Military Background" 
              class="w-full h-full object-cover object-center opacity-40"> {{-- Độ mờ ảnh 40% để nổi chữ --}}
         
@@ -19,22 +19,22 @@
     <div class="relative z-20 bg-[#880000] h-1.5"></div>
 
     {{-- Content Container --}}
-    <div class="container relative z-10 mx-auto px-6 py-20 lg:py-32">
-        
-        {{-- Metadata/Category Tag --}}
-        <div class="inline-block px-4 py-1.5 mb-8 bg-[#880000] text-white text-xs font-bold uppercase tracking-[0.2em] rounded-sm shadow-lg">
-           PHÁO BINH & SPG-9
-        </div>
+<div class="container relative z-10 mx-auto px-6 py-20 lg:py-32">
+    
+    {{-- Metadata/Category Tag --}}
+    <div class="inline-block px-4 py-1.5 mb-8 bg-[#880000] text-white text-xs font-bold uppercase tracking-[0.2em] rounded-sm shadow-lg">
+        TIỂU ĐOÀN 15 • SƯ ĐOÀN 324
+    </div>
 
-        {{-- Main Title --}}
-        <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.1] mb-8 max-w-4xl font-serif italic tracking-tight">
-            Việt Nam Tăng Cường Năng Lực Phòng Thủ Bờ Biển Với Hệ Thống Radar Mới
-        </h1>
+    {{-- Main Title --}}
+    <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.1] mb-8 max-w-4xl font-serif italic tracking-tight text-white">
+        Tiểu Đoàn 15 Pháo Binh: "Chân Đồng Vai Sắt, Đánh Giỏi Bắn Trúng"
+    </h1>
 
-        {{-- Excerpt/Summary --}}
-        <p class="text-lg md:text-xl text-gray-200 mb-12 max-w-2xl leading-relaxed font-serif italic">
-            Hệ thống radar cảnh báo sớm thế hệ mới đã chính thức được triển khai tại các điểm trọng yếu, nâng cao đáng kể khả năng giám sát vùng biển.
-        </p>
+    {{-- Excerpt/Summary --}}
+    <p class="text-lg md:text-xl text-gray-200 mb-12 max-w-2xl leading-relaxed font-serif italic">
+        Phát huy truyền thống vẻ vang của Sư đoàn 324 Anh hùng, cán bộ chiến sĩ Tiểu đoàn 15 không ngừng huấn luyện làm chủ khí tài, quyết tâm bảo vệ vững chắc vùng trời và địa bàn đóng quân.
+    </p>
 
         {{-- Action Buttons --}}
         <div class="flex space-x-6 items-center">
@@ -70,12 +70,13 @@
                                     
                                     {{-- Hình ảnh --}}
                                     <div class="relative overflow-hidden h-48 bg-gray-200">
-                                        {{-- Giả định $article->image_url chứa URL ảnh chính --}}
-                                        <img 
-                                            src="{{ $article->image_url }}" 
-                                            alt="{{ $article->title }}" 
-                                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                                        />
+                                        {{-- Sửa $article->image thành $article->image_url --}}
+                                       <img 
+                                        src="{{ $article->image_url ?? 'https://placehold.co/800x450?text=Military+News' }}" 
+                                        alt="{{ $article->title }}" 
+                                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                                        onerror="this.src='https://placehold.co/800x450?text=Image+Not+Found'"
+                                    />
                                         {{-- Bạn có thể thêm tag 'Nóng' nếu cần --}}
                                         @if($article->is_breaking)
                                             <div class="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-2 py-1 uppercase animate-pulse">Nóng</div>

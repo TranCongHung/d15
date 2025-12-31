@@ -5,7 +5,7 @@
             <div class="hidden md:flex items-center gap-4">
                 <span>{{ now()->locale('vi')->translatedFormat('l, d/m/Y') }}</span>
                 <span class="w-px h-3 bg-slate-700"></span>
-                <span>Hotline: 0987.654.321</span>
+                <span>Nghệ An, Việt Nam</span>
             </div>
             
             <div class="flex items-center gap-4 ml-auto md:ml-0">
@@ -35,12 +35,12 @@
     <div class="container mx-auto px-4 py-6 border-b border-gray-100">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
             <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-                <div class="w-12 h-12 bg-red-800 text-white flex items-center justify-center font-black text-xl rounded shadow-sm group-hover:bg-slate-900 transition-colors duration-300">
-                    D15
-                </div>
+                <div class="w-12 h-12 flex items-center justify-center rounded shadow-sm group-hover:bg-slate-900 transition-colors duration-300 overflow-hidden">
+    <img src="img/logo.png" alt="Logo" class="w-full h-full object-contain">
+</div>
                 <div class="flex flex-col">
                     <span class="text-2xl font-black uppercase tracking-widest text-slate-900 leading-none group-hover:text-red-800 transition-colors duration-300">
-                        QĐNDVN
+                       TIỂU ĐOÀN 15
                     </span>
                     <span class="text-xs text-slate-500 font-bold tracking-wider uppercase mt-1">
                         Tin tức Quân sự - Quốc phòng
