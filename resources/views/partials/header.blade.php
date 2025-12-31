@@ -5,7 +5,7 @@
             <div class="hidden md:flex items-center gap-4">
                 <span>{{ now()->locale('vi')->translatedFormat('l, d/m/Y') }}</span>
                 <span class="w-px h-3 bg-slate-700"></span>
-                <span>Hotline: 0987.654.321</span>
+                <span>Nghệ An, Việt Nam</span>
             </div>
             
             <div class="flex items-center gap-4 ml-auto md:ml-0">
@@ -35,12 +35,12 @@
     <div class="container mx-auto px-4 py-6 border-b border-gray-100">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
             <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-                <div class="w-12 h-12 bg-red-800 text-white flex items-center justify-center font-black text-xl rounded shadow-sm group-hover:bg-slate-900 transition-colors duration-300">
-                    D15
-                </div>
+                <div class="w-12 h-12 flex items-center justify-center rounded shadow-sm group-hover:bg-slate-900 transition-colors duration-300 overflow-hidden">
+    <img src="img/logo.png" alt="Logo" class="w-full h-full object-contain">
+</div>
                 <div class="flex flex-col">
                     <span class="text-2xl font-black uppercase tracking-widest text-slate-900 leading-none group-hover:text-red-800 transition-colors duration-300">
-                        QĐNDVN
+                       TIỂU ĐOÀN 15
                     </span>
                     <span class="text-xs text-slate-500 font-bold tracking-wider uppercase mt-1">
                         Tin tức Quân sự - Quốc phòng
@@ -61,43 +61,66 @@
         </div>
     </div>
 
-    {{-- 3. NAVIGATION MENU --}}
-    <nav class="bg-slate-800 text-white sticky top-0 z-40 shadow-lg border-t-4 border-red-800">
-        <div class="container mx-auto px-4">
-            <div class="md:hidden flex justify-between items-center py-3">
-                <span class="font-bold uppercase">Danh mục</span>
-                <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-white focus:outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-            </div>
+{{-- 3. NAVIGATION MENU --}}
+<nav class="bg-[#880000] sticky top-0 z-40 shadow-md">
+    <div class="container mx-auto px-4">
 
-            <ul class="hidden md:flex flex-wrap items-center gap-1">
-                @foreach($categories as $category)
-                    <li>
-                        <a href="{{ $category->code === 'ALL' ? route('home') : '#' }}" 
-                           class="block px-5 py-4 text-sm font-bold uppercase tracking-wider hover:bg-red-800 hover:text-white transition-all duration-200 {{ (request()->routeIs('home') && $category->code === 'ALL') ? 'bg-red-800' : 'text-gray-300' }}">
-                            {{ $category->name }}
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
+        @php
+            $navItems = [
+                ['name' => 'Trang chủ', 'url' => route('home')], 
+                ['name' => 'Lịch sử phát triển', 'url' => route('lich-su')], 
+                ['name' => 'Sách sử', 'url' => route('sach-su')],
+                ['name' => 'Thi nhận thức', 'url' => route('thi')],
+            ];
+        @endphp
+
+        {{-- Mobile Header --}}
+        <div class="md:hidden flex justify-between items-center py-3">
+            <span class="font-bold uppercase tracking-widest text-white">
+                Danh mục
+            </span>
+            <button
+                onclick="document.getElementById('mobile-menu').classList.toggle('hidden')"
+                class="text-white focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
         </div>
-        
-        <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-t border-slate-700">
-            <ul class="flex flex-col">
-                @foreach($categories as $category)
-                    <li>
-                        <a href="{{ $category->code === 'ALL' ? route('home') : '#' }}" 
-                           class="block px-4 py-3 text-sm font-bold uppercase border-b border-slate-800 hover:bg-red-800 hover:text-white transition-colors">
-                            {{ $category->name }}
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
-        </div>
-    </nav>
+
+        {{-- Desktop Menu --}}
+        <ul class="hidden md:flex items-center">
+            @foreach($navItems as $item)
+                <li>
+                    <a href="{{ $item['url'] }}"
+                       class="group relative block px-6 py-4 text-sm font-bold uppercase tracking-widest text-white transition-all hover:bg-red-900">
+                        {{ $item['name'] }}
+                        <span
+                            class="absolute bottom-2 left-6 right-6 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300">
+                        </span>
+                    </a>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+
+    {{-- Mobile Menu --}}
+    <div id="mobile-menu" class="hidden md:hidden bg-[#880000] border-t border-red-900">
+        <ul class="flex flex-col">
+            @foreach($navItems as $item)
+                <li>
+                    <a href="{{ $item['url'] }}"
+                       class="block px-5 py-4 text-sm font-bold uppercase tracking-widest text-white border-b border-red-900 hover:bg-red-900 transition-colors">
+                        {{ $item['name'] }}
+                    </a>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+</nav>
+ 
 </header>
 
 {{-- AUTH MODAL --}}

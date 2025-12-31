@@ -28,13 +28,19 @@
           }
         }
     </script>
+    
     <script type="importmap">
-    // ... Dán Importmap từ file HTML gốc vào đây ...
-    {
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.33.0"
+  }
+}
       "imports": {
-        "@google/genai": "https://esm.sh/@google/genai@^1.33.0"
+        "react": "https://esm.sh/react@^19.2.3",
+        "react-dom/client": "https://esm.sh/react-dom@^19.2.3/client",
+        "recharts": "https://esm.sh/recharts@^3.6.0",
+        "xlsx": "https://esm.sh/xlsx@0.18.5"
       }
-    }
     </script>
     
 </head>

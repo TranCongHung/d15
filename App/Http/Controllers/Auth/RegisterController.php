@@ -61,15 +61,23 @@ class RegisterController extends Controller
             // 4. LOGIC CHUYỂN HƯỚNG DỰA TRÊN VAI TRÒ
             $redirectTo = $this->getRedirectUrlByRole($user); 
             
-            // 5. Trả về phản hồi thành công (Dùng cho AJAX)
-            return response()->json([
-                'success' => true,
-                'message' => 'Đăng ký thành công! Chào mừng bạn.',
-                'user' => ['name' => $user->name, 'role' => $user->role],
-                'redirect' => $redirectTo, 
-            ], 201);
+            // 5. Kiểm tra xem request có phải AJAX không
+            if ($request->expectsJson() || $request->ajax()) {
+                // Trả về phản hồi JSON cho AJAX
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Đăng ký thành công! Chào mừng bạn.',
+                    'user' => ['name' => $user->name, 'role' => $user->role],
+                    'redirect' => $redirectTo,
+                ], 201);
+            } else {
+                // Trả về redirect cho form submit truyền thống
+                return redirect($redirectTo)->with('success', 'Đăng ký thành công! Chào mừng bạn.');
+            }
 
         } catch (ValidationException $e) {
+            // Log validation errors to help debugging (AJAX requests)
+            Log::info('RegisterModal validation errors', $e->errors());
             return response()->json([
                 'success' => false,
                 'message' => 'Dữ liệu không hợp lệ.',

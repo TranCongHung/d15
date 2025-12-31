@@ -5,8 +5,48 @@ const REAL_STATS = window.REAL_STATS || {
     totalComments: 0,
     failedJobs: 0
 };
-let REAL_ARTICLES = window.REAL_ARTICLES || []; // Changed to let for reassignment
-let REAL_USERS = window.REAL_USERS || []; // Changed to let for reassignment
+let REAL_ARTICLES = window.REAL_ARTICLES || [
+    {
+        id: 1,
+        title: 'Nâng cao chất lượng huấn luyện năm 2024',
+        cat: 'Huấn luyện chiến đấu',
+        user: 'Đại tá Nguyễn Văn A',
+        status: 'published',
+        views: 1250,
+        content: 'Nội dung bài viết mẫu về huấn luyện...',
+        created_at: '2024-12-01T10:00:00Z',
+        updated_at: '2024-12-01T10:00:00Z'
+    },
+    {
+        id: 2,
+        title: 'Đảm bảo kỹ thuật tăng thiết giáp',
+        cat: 'Hậu cần - Kỹ thuật',
+        user: 'Thiếu tá Trần Thị B',
+        status: 'draft',
+        views: 890,
+        content: 'Nội dung bài viết về kỹ thuật...',
+        created_at: '2024-12-02T10:00:00Z',
+        updated_at: '2024-12-02T10:00:00Z'
+    }
+]; // Changed to let for reassignment
+let REAL_USERS = window.REAL_USERS || [
+    {
+        id: 1,
+        name: 'Đại tá Nguyễn Văn A',
+        rank: 'Đại tá',
+        role: 'Quản trị viên',
+        email: 'nguyenvana@qdnd.vn',
+        joined: '15/01/2020'
+    },
+    {
+        id: 2,
+        name: 'Thiếu tá Trần Thị B',
+        rank: 'Thiếu tá',
+        role: 'Biên tập viên',
+        email: 'tranthib@qdnd.vn',
+        joined: '22/03/2021'
+    }
+]; // Changed to let for reassignment
 const REAL_CATEGORIES = window.REAL_CATEGORIES || [];
 const REAL_LOGS = window.REAL_LOGS || [];
 
@@ -14,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDashboard(REAL_STATS);
     renderStatsChart(REAL_STATS);
     renderSystemLogs();
-
     renderArticles(REAL_ARTICLES);
     renderUsers(REAL_USERS);
 
@@ -147,32 +186,46 @@ function renderSystemLogs() {
 
 
 // ---------- Articles table & CRUD ----------
-function renderArticles(articlesData) { // Renamed parameter to avoid confusion with global REAL_ARTICLES
+function renderArticles(articles = REAL_ARTICLES) {
     const tbody = document.getElementById('articles-table');
     if (!tbody) return;
 
-    if (!articlesData || articlesData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="padding:20px; text-align:center; color:#999;">Không có dữ liệu</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = articlesData.map(a => `
+    tbody.innerHTML = articles.map(article => `
         <tr>
-            <td>#${a.id}</td>
-            <td style="font-weight:600">${a.title}</td>
-            <td>${a.cat || 'N/A'}</td>
-            <td>${a.user || 'N/A'}</td>
-            <td><span class="badge ${a.status === 'published' ? 'badge-success' : 'badge-warning'}">${a.status === 'published' ? 'Đã đăng' : 'Bản nháp'}</span></td>
-            <td>
-                <button class="btn-table" onclick="populateAndOpenArticleModal(${a.id})"><i data-lucide="edit-2" style="width:14px; color:var(--army-600)"></i></button>
-                <button class="btn-table" onclick="handleDeleteArticle(${a.id})"><i data-lucide="trash" style="width:14px; color:var(--vn-red)"></i></button>
+            <td style="padding:12px; text-align:left; font-weight:600; color:#374151;">#${article.id}</td>
+            <td style="padding:12px; text-align:left; font-weight:600; color:#111827;">${escapeHtml(article.title || '')}</td>
+            <td style="padding:12px; text-align:left; color:#6b7280;">${escapeHtml(article.user || '')}</td>
+            <td style="padding:12px; text-align:left;">
+                <span class="badge ${article.status === 'published' ? 'badge-success' : 'badge-warning'}">
+                    ${article.status === 'published' ? 'Đã đăng' : 'Bản nháp'}
+                </span>
+            </td>
+            <td style="padding:12px; text-align:center; color:#6b7280;">${formatNumber(article.views || 0)}</td>
+            <td style="padding:12px; text-align:center;">
+                <button class="btn-table" onclick="populateAndOpenArticleModal(${article.id})" title="Chỉnh sửa">
+                    <i data-lucide="edit-2" style="width:14px; color:#48602a;"></i>
+                </button>
+                <button class="btn-table" onclick="handleDeleteArticle(${article.id})" title="Xóa">
+                    <i data-lucide="trash" style="width:14px; color:#dc2626;"></i>
+                </button>
             </td>
         </tr>
     `).join('');
+
+    // Re-render icons for new content
     if (window.lucide) lucide.createIcons();
 }
 
+// ---------- Articles table & CRUD ----------
+
 function populateAndOpenArticleModal(id = null) {
+    console.log('populateAndOpenArticleModal called with id:', id);
+    const modal = document.getElementById('modal-article');
+    console.log('Modal element:', modal);
+    modal.classList.add('flex');
+    modal.style.display = 'flex'; // Force display for testing
+    console.log('Modal classes after adding flex:', modal.className);
+    console.log('Modal style.display:', modal.style.display);
     const title = document.getElementById('modal-article-title');
     if (id) {
         const article = REAL_ARTICLES.find(x => x.id == id);
@@ -183,6 +236,9 @@ function populateAndOpenArticleModal(id = null) {
             document.getElementById('article-user').value = article.user;
             document.getElementById('article-status').value = article.status;
             document.getElementById('article-views').value = article.views;
+            document.getElementById('article-excerpt').value = article.excerpt || '';
+            document.getElementById('article-content').value = article.content || '';
+            // Note: File input cannot be pre-filled for security reasons
             if(title) title.innerText = "Chỉnh sửa bài viết #" + id;
         }
     } else {
@@ -193,114 +249,319 @@ function populateAndOpenArticleModal(id = null) {
         document.getElementById('article-user').value = "Đại tá Nguyễn Văn A"; // Default
         document.getElementById('article-status').value = "draft"; // Default
         document.getElementById('article-views').value = 0;
+        document.getElementById('article-excerpt').value = "";
+        document.getElementById('article-content').value = "";
+        document.getElementById('article-image').value = "";
         if(title) title.innerText = "Thêm bài viết mới";
     }
-    document.getElementById('modal-article').style.display = 'flex';
+    document.getElementById('modal-article').classList.add('flex');
+}
+
+function openCreateArticle() {
+    console.log('openCreateArticle called from admin page');
+    populateAndOpenArticleModal(); // Call without ID to create new article
 }
 
 function onSaveArticle() {
+    // Validation trước khi submit
+    const title = document.getElementById('article-title').value.trim();
+    const category = document.getElementById('article-cat').value;
+    const content = document.getElementById('article-content').value.trim();
+
+    if (!title) {
+        alert('Vui lòng nhập tiêu đề bài viết!');
+        document.getElementById('article-title').focus();
+        return;
+    }
+
+    if (!category) {
+        alert('Vui lòng chọn chuyên mục!');
+        document.getElementById('article-cat').focus();
+        return;
+    }
+
+    if (!content) {
+        alert('Vui lòng nhập nội dung bài viết!');
+        document.getElementById('article-content').focus();
+        return;
+    }
+
+    // Disable button và show loading
+    const saveBtn = document.getElementById('save-article-btn');
+    const saveText = document.getElementById('save-text');
+    const savingText = document.getElementById('saving-text');
+
+    saveBtn.disabled = true;
+    saveText.style.display = 'none';
+    savingText.style.display = 'inline';
+
     const id = document.getElementById('article-id').value;
-    // Extract data from DOM matching test.php logic
+    // Extract data from DOM với tất cả trường
     const data = {
         id: id,
-        title: document.getElementById('article-title').value,
-        cat: document.getElementById('article-cat').value,
+        title: title,
+        cat: category,
         user: document.getElementById('article-user').value,
         status: document.getElementById('article-status').value,
-        views: parseInt(document.getElementById('article-views').value) || 0
+        excerpt: document.getElementById('article-excerpt').value.trim(),
+        content: content
     };
-    handleSaveArticle(data);
-}
 
-function handleSaveArticle(data) {
-    const isNew = !data.id;
-    const method = isNew ? 'POST' : 'PUT';
-    const url = isNew ? '/admin/articles' : `/admin/articles/${data.id}`;
+    // Handle image file
+    const imageInput = document.getElementById('article-image');
+    if (imageInput.files && imageInput.files[0]) {
+        data.image = imageInput.files[0];
+        data.imageName = imageInput.files[0].name;
+    }
 
-    fetch(url, {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content // Assuming CSRF token meta tag
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(response => {
-        if (response.success) {
-            if (isNew) {
-                REAL_ARTICLES.unshift(response.article); // Add new article
-            } else {
-                const index = REAL_ARTICLES.findIndex(a => a.id == data.id);
-                if (index !== -1) {
-                    REAL_ARTICLES[index] = { ...REAL_ARTICLES[index], ...response.article }; // Update existing
-                }
-            }
-            renderArticles(REAL_ARTICLES);
-            updateStats();
-            document.getElementById('modal-article').style.display = 'none';
-            alert(response.message || 'Bài viết đã được lưu.');
-        } else {
-            alert(response.message || 'Lỗi khi lưu bài viết.');
-        }
-    })
-    .catch(error => {
-        console.error('Error saving article:', error);
-        alert('Có lỗi xảy ra khi giao tiếp với server.');
+    handleSaveArticle(data, () => {
+        // Re-enable button sau khi hoàn thành
+        saveBtn.disabled = false;
+        saveText.style.display = 'inline';
+        savingText.style.display = 'none';
     });
 }
 
-function handleDeleteArticle(id) {
-    if(confirm('Xóa bài viết này?')) {
-        fetch(`/admin/articles/${id}`, {
-            method: 'DELETE',
+// Updated handleSaveArticle function with full API integration
+function handleSaveArticle(data, onComplete = null) {
+    // Map category name to category ID
+    const categoryMap = {
+        'Quốc phòng toàn dân': 1,
+        'Hậu cần - Kỹ thuật': 2,
+        'Huấn luyện chiến đấu': 3,
+        'Công tác Đảng': 4
+    };
+
+    const categoryId = categoryMap[data.cat] || 1;
+
+    // Map status from Vietnamese to English
+    const statusMap = {
+        'Đã xuất bản': 'published',
+        'Bản nháp': 'draft'
+    };
+
+    const apiData = {
+        title: data.title,
+        category_id: categoryId,
+        body: data.content || '',
+        excerpt: data.excerpt || (data.content ? data.content.substring(0, 150) + '...' : ''),
+        image_url: data.imageName ? `/images/articles/${data.imageName}` : null,
+        status: statusMap[data.status] || 'draft'
+    };
+
+    // Close modal first
+    const modal = document.getElementById('modal-article');
+    if (modal) {
+        modal.classList.remove('flex');
+    }
+
+    if (data.id && !isNaN(data.id) && data.id < 1000000000000) { // Check if it's a real database ID
+        // Edit existing article via API
+        fetch(`/admin/articles/${data.id}`, {
+            method: 'PUT',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            },
+            body: JSON.stringify(apiData)
         })
         .then(response => response.json())
-        .then(response => {
-            if (response.success) {
-                REAL_ARTICLES = REAL_ARTICLES.filter(a => a.id != id);
+        .then(result => {
+            if (result.success) {
+                alert(result.message);
+                // Update local array
+                const index = REAL_ARTICLES.findIndex(a => a.id == data.id);
+                if (index !== -1) {
+                    REAL_ARTICLES[index] = result.article;
+                }
                 renderArticles(REAL_ARTICLES);
                 updateStats();
-                alert(response.message || 'Bài viết đã được xóa.');
+                if (onComplete) onComplete();
             } else {
-                alert(response.message || 'Lỗi khi xóa bài viết.');
+                alert('Lỗi: ' + (result.message || 'Không thể cập nhật bài viết'));
+                if (onComplete) onComplete();
             }
         })
         .catch(error => {
-            console.error('Error deleting article:', error);
-            alert('Có lỗi xảy ra khi giao tiếp với server.');
+            console.error('Error updating article:', error);
+            alert('Có lỗi xảy ra khi cập nhật bài viết');
+            if (onComplete) onComplete();
+        });
+    } else {
+        // Create new article via API
+        fetch('/admin/articles', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            },
+            body: JSON.stringify(apiData)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                alert(result.message + '\nID: ' + result.article.id);
+                // Add to local array
+                REAL_ARTICLES.unshift(result.article);
+                renderArticles(REAL_ARTICLES);
+                updateStats();
+
+                // Đảm bảo modal được đóng sau khi thành công
+                const modal = document.getElementById('modal-article');
+                if (modal) {
+                    modal.classList.remove('flex');
+                    modal.style.display = 'none';
+                }
+
+                if (onComplete) onComplete();
+            } else {
+                alert('Lỗi: ' + (result.message || 'Không thể tạo bài viết'));
+                // Mở lại modal nếu có lỗi
+                const modal = document.getElementById('modal-article');
+                if (modal) {
+                    modal.classList.add('flex');
+                    modal.style.display = 'flex';
+                }
+                if (onComplete) onComplete();
+            }
+        })
+        .catch(error => {
+            console.error('Error creating article:', error);
+            alert('Có lỗi xảy ra khi tạo bài viết');
+            // Mở lại modal nếu có lỗi
+            const modal = document.getElementById('modal-article');
+            if (modal) {
+                modal.classList.add('flex');
+                modal.style.display = 'flex';
+            }
+            if (onComplete) onComplete();
         });
     }
 }
 
+// End of file
+function handleSaveArticle_old(data) {
+    if (data.id) {
+        // Edit existing article
+        const index = REAL_ARTICLES.findIndex(a => a.id == data.id);
+        if (index !== -1) {
+            // Update existing article
+            REAL_ARTICLES[index] = {
+                ...REAL_ARTICLES[index],
+                ...data,
+                updated_at: new Date().toISOString()
+            };
+            alert('Bài viết đã được cập nhật thành công!');
+        }
+    } else {
+        // Create new article via API
+        const categoryMap = {
+            'Quốc phòng toàn dân': 1,
+            'Hậu cần - Kỹ thuật': 2,
+            'Huấn luyện chiến đấu': 3,
+            'Công tác Đảng': 4
+        };
+
+        const categoryId = categoryMap[data.cat] || 1;
+
+        const apiData = {
+            title: data.title,
+            category_id: categoryId,
+            body: data.content || '',
+            excerpt: data.content ? data.content.substring(0, 150) + '...' : '',
+            image_url: data.imageName ? `/images/articles/${data.imageName}` : null,
+            status: data.status
+        };
+
+        fetch('/admin/articles', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            },
+            body: JSON.stringify(apiData)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                alert(result.message + '\nID: ' + result.article.id);
+                // Add to local array
+                REAL_ARTICLES.unshift(result.article);
+                renderArticles(REAL_ARTICLES);
+                updateStats();
+            } else {
+                alert('Lỗi: ' + (result.message || 'Không thể tạo bài viết'));
+            }
+        })
+        .catch(error => {
+            console.error('Error creating article:', error);
+            alert('Có lỗi xảy ra khi tạo bài viết');
+        });
+    }
+
+    // Close modal and refresh table
+    const modal = document.getElementById('modal-article');
+    if (modal) {
+        modal.classList.remove('flex');
+    }
+
+    renderArticles(REAL_ARTICLES);
+    updateStats();
+}
+
+function handleDeleteArticle(id) {
+    if(confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
+        // Create a form and submit it to properly handle CSRF and method spoofing
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/articles/${id}`;
+
+        // Add CSRF token
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = document.querySelector('meta[name="csrf-token"]').content;
+        form.appendChild(csrfToken);
+
+        // Add method spoofing for DELETE
+        const methodField = document.createElement('input');
+        methodField.type = 'hidden';
+        methodField.name = '_method';
+        methodField.value = 'DELETE';
+        form.appendChild(methodField);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
 // ---------- Users table & CRUD ----------
-function renderUsers(usersData) { // Renamed parameter
+function renderUsers(users = REAL_USERS) {
     const tbody = document.getElementById('users-table');
     if (!tbody) return;
 
-    if (!usersData || usersData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="padding:20px; text-align:center; color:#999;">Không có dữ liệu</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = usersData.map(u => `
+    tbody.innerHTML = users.map(user => `
         <tr>
-            <td>${u.name}</td>
-            <td>${u.rank || 'N/A'}</td>
-            <td>${u.role || 'N/A'}</td>
-            <td>${u.email}</td>
-            <td>${u.joined}</td>
-            <td>
-                <button class="btn-table" onclick="populateAndOpenUserModal(${u.id})"><i data-lucide="user-cog" style="width:14px; color:var(--army-600)"></i></button>
-                <button class="btn-table" onclick="handleDeleteUser(${u.id})"><i data-lucide="user-minus" style="width:14px; color:var(--vn-red)"></i></button>
+            <td style="padding:12px; text-align:left; font-weight:600; color:#374151;">${user.id}</td>
+            <td style="padding:12px; text-align:left; font-weight:600; color:#111827;">${escapeHtml(user.name || '')}</td>
+            <td style="padding:12px; text-align:left; color:#6b7280;">${escapeHtml(user.email || '')}</td>
+            <td style="padding:12px; text-align:left; color:#6b7280;">${escapeHtml(user.role || '')}</td>
+            <td style="padding:12px; text-align:center;">
+                <button class="btn-table" onclick="populateAndOpenUserModal(${user.id})" title="Chỉnh sửa">
+                    <i data-lucide="user-cog" style="width:14px; color:#48602a;"></i>
+                </button>
+                <button class="btn-table" onclick="handleDeleteUser(${user.id})" title="Xóa">
+                    <i data-lucide="user-minus" style="width:14px; color:#dc2626;"></i>
+                </button>
             </td>
         </tr>
     `).join('');
+
+    // Re-render icons for new content
     if (window.lucide) lucide.createIcons();
 }
+
+// ---------- Users table & CRUD ----------
 
 function populateAndOpenUserModal(id = null) {
     const title = document.getElementById('modal-user-title');
@@ -325,7 +586,7 @@ function populateAndOpenUserModal(id = null) {
         document.getElementById('user-joined').value = "26/10/2024"; // Default
         if(title) title.innerText = "Thêm nhân sự mới";
     }
-    document.getElementById('modal-user').style.display = 'flex';
+    document.getElementById('modal-user').classList.add('flex');
 }
 
 function onSaveUser() {
@@ -367,7 +628,7 @@ function handleSaveUser(data) {
             }
             renderUsers(REAL_USERS);
             updateStats();
-            document.getElementById('modal-user').style.display = 'none';
+            document.getElementById('modal-user').classList.remove('flex');
             alert(response.message || 'Hồ sơ nhân sự đã được lưu.');
         } else {
             alert(response.message || 'Lỗi khi lưu hồ sơ nhân sự.');
@@ -436,20 +697,41 @@ function switchView(viewName) {
     const activeNav = document.getElementById(`nav-${viewName}`);
     if (activeNav) activeNav.classList.add('active');
 
-    if (viewName === 'articles') renderArticles(REAL_ARTICLES);
-    else if (viewName === 'users') renderUsers(REAL_USERS);
-    else if (viewName === 'dashboard') {
+    if (viewName === 'dashboard') {
         renderDashboard(REAL_STATS);
         renderStatsChart(REAL_STATS);
         renderSystemLogs();
+    } else if (viewName === 'articles') {
+        // Render immediately
+        renderArticles(REAL_ARTICLES);
+
+        // Render articles
+    } else if (viewName === 'users') {
+        // Delay render to ensure DOM is updated
+        setTimeout(() => renderUsers(REAL_USERS), 100);
     }
 }
+
+// Test function
+window.testModal = function() {
+    console.log('TEST MODAL: Function called');
+    const modal = document.getElementById('modal-article');
+    console.log('TEST MODAL: Modal element:', modal);
+    if (modal) {
+        console.log('TEST MODAL: Adding flex class');
+        modal.classList.add('flex');
+        console.log('TEST MODAL: Modal should be visible now');
+    } else {
+        console.error('TEST MODAL: Modal element not found!');
+        alert('Modal không tồn tại trong DOM!');
+    }
+};
 
 // Export functions to global scope used by inline onclicks
 window.switchView = switchView;
 window.closeModal = (id) => {
     const el = document.getElementById(id);
-    if(el) el.style.display = 'none';
+    if(el) el.classList.remove('flex');
 };
 // Alias open functions to match test.php interface if needed
 window.openArticleModal = populateAndOpenArticleModal;
@@ -458,8 +740,6 @@ window.populateAndOpenArticleModal = populateAndOpenArticleModal;
 window.handleDeleteArticle = handleDeleteArticle;
 window.populateAndOpenUserModal = populateAndOpenUserModal;
 window.handleDeleteUser = handleDeleteUser;
-window.renderArticles = renderArticles;
-window.renderUsers = renderUsers;
 window.updateStats = () => { // Create a simple updateStats that calls renderDashboard
     renderDashboard(REAL_STATS);
 };
@@ -467,3 +747,129 @@ window.saveArticle = onSaveArticle;
 window.saveUser = onSaveUser;
 window.deleteArticle = handleDeleteArticle;
 window.deleteUser = handleDeleteUser;
+window.renderArticles = renderArticles;
+window.renderUsers = renderUsers;
+window.openCreateArticle = openCreateArticle;
+
+// ---------- Form đăng bài viết trong trang quản lý ----------
+function toggleArticleForm() {
+    const formContainer = document.getElementById('article-create-form-container');
+    if (formContainer) {
+        formContainer.classList.toggle('hidden');
+        
+        // Reset form khi ẩn
+        if (formContainer.classList.contains('hidden')) {
+            document.getElementById('article-create-form').reset();
+        } else {
+            // Scroll đến form khi hiển thị
+            formContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            // Focus vào input đầu tiên
+            setTimeout(() => {
+                const firstInput = document.getElementById('form-article-title');
+                if (firstInput) firstInput.focus();
+            }, 100);
+        }
+        
+        // Re-render icons
+        if (window.lucide) lucide.createIcons();
+    }
+}
+
+function submitArticleForm() {
+    const form = document.getElementById('article-create-form');
+    if (!form) return;
+
+    // Lấy dữ liệu từ form
+    const title = document.getElementById('form-article-title').value.trim();
+    const categoryId = document.getElementById('form-article-category').value;
+    const body = document.getElementById('form-article-body').value.trim();
+    const excerpt = document.getElementById('form-article-excerpt').value.trim();
+    const imageUrl = document.getElementById('form-article-image').value.trim();
+    const status = document.querySelector('input[name="status"]:checked')?.value || 'draft';
+
+    // Validation
+    if (!title) {
+        alert('Vui lòng nhập tiêu đề bài viết!');
+        document.getElementById('form-article-title').focus();
+        return;
+    }
+
+    if (!categoryId) {
+        alert('Vui lòng chọn chuyên mục!');
+        document.getElementById('form-article-category').focus();
+        return;
+    }
+
+    if (!body) {
+        alert('Vui lòng nhập nội dung bài viết!');
+        document.getElementById('form-article-body').focus();
+        return;
+    }
+
+    // Disable button và show loading
+    const submitBtn = document.getElementById('submit-article-btn');
+    const submitText = document.getElementById('submit-text');
+    const submitLoading = document.getElementById('submit-loading');
+
+    submitBtn.disabled = true;
+    submitText.style.display = 'none';
+    submitLoading.style.display = 'inline';
+
+    // Chuẩn bị dữ liệu gửi lên API
+    const apiData = {
+        title: title,
+        category_id: parseInt(categoryId),
+        body: body,
+        excerpt: excerpt || null,
+        image_url: imageUrl || null,
+        status: status
+    };
+
+    // Gọi API để tạo bài viết
+    fetch('/admin/articles', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+        },
+        body: JSON.stringify(apiData)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            alert(result.message || 'Bài viết đã được tạo thành công!');
+            
+            // Thêm bài viết mới vào danh sách
+            if (result.article) {
+                REAL_ARTICLES.unshift(result.article);
+                renderArticles(REAL_ARTICLES);
+                
+                // Cập nhật stats
+                if (REAL_STATS) {
+                    REAL_STATS.totalArticles = REAL_ARTICLES.length;
+                }
+                updateStats();
+            }
+            
+            // Reset form và ẩn form
+            form.reset();
+            toggleArticleForm();
+        } else {
+            alert('Lỗi: ' + (result.message || 'Không thể tạo bài viết'));
+        }
+    })
+    .catch(error => {
+        console.error('Error creating article:', error);
+        alert('Có lỗi xảy ra khi tạo bài viết. Vui lòng thử lại.');
+    })
+    .finally(() => {
+        // Re-enable button
+        submitBtn.disabled = false;
+        submitText.style.display = 'inline';
+        submitLoading.style.display = 'none';
+    });
+}
+
+// Export functions to global scope
+window.toggleArticleForm = toggleArticleForm;
+window.submitArticleForm = submitArticleForm;
