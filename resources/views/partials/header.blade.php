@@ -133,12 +133,12 @@
 
         {{-- Left Side: Image --}}
         <div class="hidden md:block w-1/2 bg-slate-800 relative">
-            <img src="https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?q=80&w=1932&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay" />
+            <img src="{{ asset('img/banner web.jpg') }}" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay" />
             <div class="absolute inset-0 bg-gradient-to-t from-military-red/80 to-slate-900/60 flex flex-col justify-end p-12 text-white">
-                <h2 class="text-4xl font-serif font-black uppercase mb-4 leading-none">Tham Gia<br/>Mạng Lưới</h2>
-                <p class="text-sm text-gray-200 font-light opacity-80">
-                    Truy cập các bản tin tình báo độc quyền, phân tích chuyên sâu và bình luận từ các chuyên gia hàng đầu.
-                </p>
+              <h2 class="text-4xl font-serif font-black uppercase mb-4 leading-none">Phát Huy<br/>Truyền Thống</h2>
+<p class="text-sm text-gray-200 font-light opacity-80">
+    Tìm hiểu lịch sử vẻ vang, trau dồi bản lĩnh chính trị và cập nhật kịp thời các hoạt động huấn luyện, sẵn sàng chiến đấu của đơn vị.
+</p>
             </div>
         </div>
 
@@ -202,7 +202,8 @@
 </div>
 
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Khai báo các phần tử DOM
     const authModal = document.getElementById('auth-modal');
     const loginTab = document.getElementById('login-tab');
     const registerTab = document.getElementById('register-tab');
@@ -213,74 +214,95 @@
     const passwordConfirmGroup = document.getElementById('password-confirm-group');
     const phoneGroup = document.getElementById('phone-group');
 
-    // URL an toàn được render từ server
-    const loginUrl = "{{ Route::has('login.store') ? route('login.store') : (Route::has('login') ? route('login') : url('/login')) }}";
-    const registerUrl = "{{ Route::has('register.store') ? route('register.store') : (Route::has('register') ? route('register') : url('/register')) }}";
+    // 2. Định nghĩa URLs từ Laravel
+    const loginUrl = "{{ route('login.modal') }}";
+    const registerUrl = "{{ route('register.modal') }}";
 
-    if (!authModal || !loginTab || !registerTab || !submitButton) return;
+    if (!authModal || !authForm) return;
 
-    window.openAuth = function(mode) {
-        authModal.classList.remove('hidden');
-        document.body.classList.add('overflow-hidden'); 
-        window.setAuthMode(mode);
-    }
-
-    window.closeAuth = function() {
-        authModal.classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-    }
-
+    // 3. Hàm xử lý chuyển đổi Đăng nhập / Đăng ký
     window.setAuthMode = function(mode) {
         if (mode === 'LOGIN') {
             loginTab.classList.add('text-military-red', 'border-military-red');
             loginTab.classList.remove('text-gray-400', 'border-transparent');
             registerTab.classList.remove('text-military-red', 'border-military-red');
             registerTab.classList.add('text-gray-400', 'border-transparent');
+            
             submitButton.textContent = 'ĐĂNG NHẬP HỆ THỐNG';
+            authForm.action = loginUrl;
             
-            // Cập nhật action của form
-            if(authForm) authForm.action = loginUrl;
-            
-            nameGroup.classList.add('hidden');
-            passwordConfirmGroup.classList.add('hidden');
-            phoneGroup.classList.add('hidden');
-            
-            nameGroup.querySelector('input').removeAttribute('required');
-            passwordConfirmGroup.querySelector('input').removeAttribute('required');
-            phoneGroup.querySelector('input').removeAttribute('required');
+            [nameGroup, passwordConfirmGroup, phoneGroup].forEach(el => el.classList.add('hidden'));
+            [nameGroup, passwordConfirmGroup, phoneGroup].forEach(el => el.querySelector('input').removeAttribute('required'));
 
-        } else if (mode === 'REGISTER') {
+        } else {
             registerTab.classList.add('text-military-red', 'border-military-red');
             registerTab.classList.remove('text-gray-400', 'border-transparent');
             loginTab.classList.remove('text-military-red', 'border-military-red');
             loginTab.classList.add('text-gray-400', 'border-transparent');
+            
             submitButton.textContent = 'ĐĂNG KÝ NGAY';
+            authForm.action = registerUrl;
 
-            // Cập nhật action của form
-            if(authForm) authForm.action = registerUrl;
-
-            nameGroup.classList.remove('hidden');
-            passwordConfirmGroup.classList.remove('hidden');
-            phoneGroup.classList.remove('hidden');
-
-            nameGroup.querySelector('input').setAttribute('required', 'required');
-            passwordConfirmGroup.querySelector('input').setAttribute('required', 'required');
-            phoneGroup.querySelector('input').setAttribute('required', 'required');
+            [nameGroup, passwordConfirmGroup, phoneGroup].forEach(el => el.classList.remove('hidden'));
+            [nameGroup, passwordConfirmGroup, phoneGroup].forEach(el => el.querySelector('input').setAttribute('required', 'required'));
         }
+    };
+
+    // 4. Các hàm đóng/mở Modal
+    window.openAuth = function(mode) {
+        authModal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden'); 
+        window.setAuthMode(mode);
+    };
+
+    window.closeAuth = function() {
+        authModal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    };
+
+    // 5. XỬ LÝ GỬI FORM BẰNG AJAX (Quan trọng nhất)
+    authForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Hiệu ứng chờ khi đang xử lý
+        const originalText = submitButton.textContent;
+        submitButton.textContent = 'ĐANG XỬ LÝ...';
+        submitButton.disabled = true;
+
+        const formData = new FormData(this);
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+            }
+        })
+        .then(response => response.json())
+       .then(data => {
+    if (data.success) {
+        window.location.href = data.redirect;
+    } else {
+        // Kiểm tra nếu có danh sách lỗi chi tiết từ Laravel
+        if (data.errors) {
+            let errorMessages = Object.values(data.errors).flat().join('\n');
+            alert("Lỗi nhập liệu:\n" + errorMessages);
+        } else {
+            alert(data.message || 'Dữ liệu không hợp lệ.');
+        }
+        
+        // Log ra console để bạn kiểm tra kỹ hơn khi nhấn F12
+        console.log('Chi tiết lỗi:', data.errors);
+        
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
     }
-
-    // Close modal when clicking outside
-    authModal.addEventListener('click', function(e) {
-        if (e.target === authModal) {
-            window.closeAuth();
-        }
+})
     });
 
-    // Close modal on Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && !authModal.classList.contains('hidden')) {
-            window.closeAuth();
-        }
-    });
-   });
+    // Đóng modal khi click ra ngoài hoặc phím Esc
+    authModal.addEventListener('click', (e) => e.target === authModal && window.closeAuth());
+    document.addEventListener('keydown', (e) => e.key === 'Escape' && window.closeAuth());
+});
 </script>
