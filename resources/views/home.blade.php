@@ -86,7 +86,7 @@
                                     <div class="p-5 flex flex-col flex-grow">
                                         <div class="flex items-center justify-between mb-2">
                                             {{-- Giả định $article->category là mối quan hệ đã tải --}}
-                                            <span class="text-xs font-bold text-military-red uppercase tracking-wider">{{ $article->category->name }}</span>
+                                            <span class="text-xs font-bold text-military-red uppercase tracking-wider">{{ $article->category->name ?? 'Uncategorized' }}</span>
                                             <span class="text-xs text-gray-400">{{ $article->created_at->diffForHumans() }}</span>
                                         </div>
                                         
@@ -140,7 +140,6 @@
             // Thay thế logic này bằng route Laravel thực tế nếu bạn muốn lọc theo category code
             window.location.href = categoryCode === 'ALL' ? '{{ route('home') }}' : `{{ url('/') }}/${categoryCode.toLowerCase()}`;
         }
-        
         // Cần đảm bảo modal được định nghĩa trong layouts.app hoặc một partial khác.
         window.openModal = function() {
             const modal = document.getElementById('ai-modal');

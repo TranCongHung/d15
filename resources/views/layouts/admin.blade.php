@@ -21,6 +21,9 @@ window.REAL_USERS = @json($users ?? []);
 window.REAL_CATEGORIES = @json($categories ?? []);
 window.REAL_COMMENTS = @json($comments ?? []);
 window.REAL_LOGS = @json($logs ?? []);
+
+// Thống kê bài viết theo chuyên mục
+window.CATEGORY_STATS = @json($categoryStats ?? []);
 </script>
 @endonce
 
@@ -40,7 +43,6 @@ window.REAL_LOGS = @json($logs ?? []);
 
     @yield('content')
 
-    @include('admin.article-modal')
     @include('admin.user-modal')
 
     <script>

@@ -77,7 +77,12 @@ class ArticleSeeder extends Seeder
             // Gán ảnh
             if (in_array('image_url', $columns)) {
              $data['image_url'] = $item['img'];
-}
+            }
+
+            // Gán published_at để bài viết được hiển thị
+            if (in_array('published_at', $columns)) {
+                $data['published_at'] = now();
+            }
 
             Article::create($data);
         }

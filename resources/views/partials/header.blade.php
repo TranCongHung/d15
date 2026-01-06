@@ -9,6 +9,15 @@
             </div>
             
             <div class="flex items-center gap-4 ml-auto md:ml-0">
+                {{-- Music Player Button --}}
+                <button id="music-toggle" onclick="toggleMusic()" class="flex items-center gap-1 hover:text-white transition-colors cursor-pointer" title="Bật/Tắt nhạc nền">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                    <span class="text-xs uppercase font-bold hidden sm:inline">Nhạc</span>
+                </button>
+                <span class="w-px h-3 bg-slate-700"></span>
+
                 @guest
                     {{-- Sử dụng onclick để mở Modal thay vì gọi route('login') gây lỗi --}}
                     <button onclick="openAuth('LOGIN')" class="hover:text-white transition-colors uppercase font-bold cursor-pointer">Đăng nhập</button>
@@ -18,7 +27,7 @@
                     <div class="flex items-center gap-2">
                         <span class="text-white font-bold">Hi, {{ Auth::user()->name }}</span>
                         @if(Auth::user()->role === 'admin')
-                            <a href="{{ route('dashboard') }}" class="text-yellow-500 hover:text-yellow-400 text-[10px] uppercase border border-yellow-600 px-1 rounded">Admin</a>
+                            <a href="{{ route('admin.dashboard') }}" class="text-yellow-500 hover:text-yellow-400 text-[10px] uppercase border border-yellow-600 px-1 rounded">Admin</a>
                         @endif
                     </div>
                     {{-- Kiểm tra route logout có tồn tại không trước khi render form --}}
@@ -49,14 +58,14 @@
             </a>
 
             <div class="hidden md:block w-1/3">
-                <div class="relative">
-                    <input type="text" placeholder="Tìm kiếm tin tức..." class="w-full pl-4 pr-10 py-2 bg-gray-50 border border-gray-200 rounded text-sm focus:outline-none focus:border-red-800 focus:ring-1 focus:ring-red-800 transition-all">
-                    <button class="absolute right-0 top-0 h-full px-3 text-gray-400 hover:text-red-800">
+                <form action="{{ route('search') }}" method="GET" class="relative">
+                    <input type="text" name="q" placeholder="Tìm kiếm tin tức..." class="w-full pl-4 pr-10 py-2 bg-gray-50 border border-gray-200 rounded text-sm focus:outline-none focus:border-red-800 focus:ring-1 focus:ring-red-800 transition-all" value="{{ request('q') }}">
+                    <button type="submit" class="absolute right-0 top-0 h-full px-3 text-gray-400 hover:text-red-800">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </button>
-                </div>
+                </form>
             </div>
         </div>
     </div>

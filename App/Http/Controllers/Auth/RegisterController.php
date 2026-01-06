@@ -22,7 +22,7 @@ class RegisterController extends Controller
         if ($user->role === 'admin') {
             // Chuyển hướng đến trang người dùng (ví dụ: trang chủ /home)
             // route('home') phải được định nghĩa trong web.php
-           return route('dashboard') ?? '/index';  
+           return route('admin.dashboard') ?? '/index';  
         } else {
             // Chuyển hướng đến trang quản trị (ví dụ: trang index/dashboard)
             // route('dashboard') phải được định nghĩa trong web.php

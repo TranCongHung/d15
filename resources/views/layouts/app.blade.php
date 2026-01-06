@@ -47,10 +47,16 @@
 <body class="font-sans text-slate-800">
   <script src="{{ asset('js/app.js') }}"></script>
    
+    {{-- Background Music Player --}}
+    <audio id="background-music" loop preload="none">
+        <source src="{{ asset('nhac/(273) CON RỒNG CHÁU TIÊN (SS Remix) - Hùng Min - NHẠC KỈ NIỆM 50 NĂM 30-4 GIẢI PHÓNG MIỀN NAM HÀO HÙNG - YouTube.mp3') }}" type="audio/mpeg">
+        Trình duyệt của bạn không hỗ trợ phát âm thanh.
+    </audio>
+
     <div id="app">
         {{-- HEADER (Sử dụng cú pháp Blade để nhúng partial) --}}
         @include('partials.header')
-        
+
         <main>
             {{-- Vùng hiển thị nội dung chính của từng trang con --}}
             @yield('content')
@@ -59,9 +65,72 @@
         {{-- FOOTER --}}
         @include('partials.footer')
 
-       
+
     </div>
     
+    {{-- Background Music Control Script --}}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const music = document.getElementById('background-music');
+        const musicToggle = document.getElementById('music-toggle');
+        const musicIcon = musicToggle.querySelector('svg');
+
+        // Check if music was previously playing (stored in localStorage)
+        const isMusicPlaying = localStorage.getItem('musicPlaying') === 'true';
+
+        if (isMusicPlaying) {
+            music.volume = 0.3; // Set volume to 30%
+            music.play().catch(function(error) {
+                console.log('Không thể tự động phát nhạc:', error);
+            });
+            updateMusicIcon(true);
+        }
+
+        // Music toggle function
+        window.toggleMusic = function() {
+            if (music.paused) {
+                music.volume = 0.3; // Set volume to 30%
+                music.play().then(function() {
+                    localStorage.setItem('musicPlaying', 'true');
+                    updateMusicIcon(true);
+                }).catch(function(error) {
+                    console.log('Không thể phát nhạc:', error);
+                });
+            } else {
+                music.pause();
+                localStorage.setItem('musicPlaying', 'false');
+                updateMusicIcon(false);
+            }
+        };
+
+        // Update music icon based on playing state
+        function updateMusicIcon(isPlaying) {
+            if (isPlaying) {
+                // Playing icon (filled speaker)
+                musicIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />';
+                musicToggle.classList.add('text-green-400');
+                musicToggle.classList.remove('text-slate-300');
+            } else {
+                // Paused icon (outline speaker)
+                musicIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />';
+                musicToggle.classList.remove('text-green-400');
+                musicToggle.classList.add('text-slate-300');
+            }
+        }
+
+        // Update icon when music starts/stops naturally
+        music.addEventListener('play', function() {
+            updateMusicIcon(true);
+            localStorage.setItem('musicPlaying', 'true');
+        });
+
+        music.addEventListener('pause', function() {
+            updateMusicIcon(false);
+            localStorage.setItem('musicPlaying', 'false');
+        });
+    });
+    </script>
+
     {{-- Scripts JS/Logic AI (Sẽ được viết lại ở home.blade.php) --}}
     @yield('scripts')
 </body>

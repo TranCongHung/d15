@@ -8,24 +8,41 @@ use App\Models\Category;
 
 class HomeController extends Controller
 {
+    /**
+     * Trang chủ / danh sách bài viết
+     */
     public function index()
     {
-        // 1. Lấy bài viết mới nhất cho khu vực chính (Sử dụng ->paginate() để kích hoạt phân trang)
-        // Lưu ý: Dùng ->latest() gọn hơn ->orderBy('created_at', 'desc')
         $latestArticles = Article::with(['author', 'category'])
-            ->latest() // Sắp xếp theo created_at DESC
-            ->paginate(8); // Lấy 8 bài viết/trang và tạo đối tượng Paginator
-            
-        // 2. Lấy bài viết phổ biến nhất cho Sidebar (Sử dụng ->get() vì không cần phân trang)
-        $popularArticles = Article::with(['author', 'category'])
-            ->orderBy('view_count', 'desc')
-            ->limit(4) // Giới hạn 4 bài
-            ->get(); // Lấy Collection
+            ->whereNotNull('published_at')
+            ->latest()
+            ->paginate(8);
 
-        // Trả về view với các biến đã được load đúng cách
+        $popularArticles = Article::with(['author', 'category'])
+            ->whereNotNull('published_at')
+            ->orderByDesc('view_count')
+            ->limit(4)
+            ->get();
+
         return view('home', compact(
-            'latestArticles', 
+            'latestArticles',
             'popularArticles'
         ));
+    }
+
+    /**
+     * Trang chi tiết bài viết
+     */
+    public function show(string $slug)
+    {
+        $article = Article::with(['author', 'category', 'comments.user'])
+            ->where('slug', $slug)
+            ->whereNotNull('published_at')
+            ->firstOrFail();
+
+        // Tăng lượt xem
+        $article->increment('view_count');
+
+        return view('articles.show', compact('article'));
     }
 }

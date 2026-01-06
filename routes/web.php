@@ -19,6 +19,10 @@ use App\Http\Controllers\ArticleController;
 // Trang chủ
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Tìm kiếm
+Route::get('/search', [HomeController::class, 'search'])->name('search');
+
+
 // Comments routes
 Route::post('/articles/{article:slug}/comments', [CommentController::class, 'store'])->name('comments.store');
 
