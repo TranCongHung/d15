@@ -1,0 +1,84 @@
+# Huong dan cau hinh Facebook va Google OAuth
+
+## 1. CAU HINH FACEBOOK OAUTH
+
+### Buoc 1: Tao Facebook App
+1. Vao https://developers.facebook.com/
+2. Dang nhap vao tai khoan Facebook cua ban
+3. Click 'My Apps' -> 'Create App'
+4. Chon 'Consumer' (hoac 'Business' neu ban la doanh nghiep)
+5. Nhap thong tin:
+   - App name: Ten ung dung cua ban (VD: D151 News)
+   - App contact email: Email cua ban
+6. Click 'Create App'
+
+### Buoc 2: Them Facebook Login
+1. Trong dashboard app, click 'Add Product'
+2. Tim 'Facebook Login' va click 'Set Up'
+3. Chon 'Web' platform
+4. Nhap site URL: http://127.0.0.1:8000 (hoac domain cua ban)
+
+### Buoc 3: Cau hinh Valid OAuth Redirect URIs
+1. Trong Facebook Login -> Settings
+2. Them URI: http://127.0.0.1:8000/auth/facebook/callback
+3. Luu thay doi
+
+### Buoc 4: Lay App ID va App Secret
+1. Trong Settings -> Basic
+2. Copy 'App ID' -> day la FACEBOOK_CLIENT_ID
+3. Click 'Show' ben 'App Secret' -> copy gia tri -> day la FACEBOOK_CLIENT_SECRET
+
+## 2. CAU HINH GOOGLE OAUTH
+
+### Buoc 1: Tao Google Cloud Project
+1. Vao https://console.cloud.google.com/
+2. Tao project moi hoac chon project da co
+3. Vao 'APIs & Services' -> 'Credentials'
+
+### Buoc 2: Tao OAuth 2.0 Client ID
+1. Click 'Create Credentials' -> 'OAuth 2.0 Client ID'
+2. Chon 'Web application'
+3. Nhap thong tin:
+   - Name: Ten ung dung (VD: D151 News)
+   - Authorized JavaScript origins: http://127.0.0.1:8000
+   - Authorized redirect URIs: http://127.0.0.1:8000/auth/google/callback
+
+### Buoc 3: Lay Client ID va Client Secret
+1. Sau khi tao, ban se thay 'Client ID' va 'Client Secret'
+2. Client ID -> GOOGLE_CLIENT_ID
+3. Client Secret -> GOOGLE_CLIENT_SECRET
+
+## 3. CAP NHAT FILE .env
+
+Thay the cac gia tri trong file .env:
+
+FACEBOOK_CLIENT_ID=your_facebook_app_id_here    # -> Thay bang App ID tu Facebook
+FACEBOOK_CLIENT_SECRET=your_facebook_app_secret_here  # -> Thay bang App Secret tu Facebook
+
+GOOGLE_CLIENT_ID=your_google_client_id_here    # -> Thay bang Client ID tu Google
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here  # -> Thay bang Client Secret tu Google
+
+## 4. CHAY LAI UNG DUNG
+
+Sau khi cap nhat .env, khoi dong lai server:
+
+php artisan serve
+
+## 5. TEST SOCIAL LOGIN
+
+1. Vao trang web cua ban
+2. Click dang nhap
+3. Thu click nut Facebook/Google
+4. Neu cau hinh dung, ban se duoc chuyen huong den trang dang nhap cua provider
+
+## LUU Y QUAN TRONG:
+
+- Domain trong redirect URI phai khop chinh xac voi domain ban dang chay ung dung
+- Neu ban dang chay tren domain khac (khong phai localhost), cap nhat redirect URI trong ca Facebook va Google
+- Facebook App can duoc chuyen tu 'Development Mode' sang 'Live Mode' de hoat dong voi nguoi dung khac
+
+Neu van gap loi, kiem tra:
+1. Gia tri cac bien trong .env co dung khong
+2. Redirect URI co khop khong
+3. App/Facebook/Google co duoc publish/live khong
+

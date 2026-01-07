@@ -39,31 +39,36 @@
         @endif
     </div>
 
-    {{-- 2. HỘP TIN ĐĂNG KÝ (NEWSLETTER) --}}
-    {{-- Thay đổi màu nền để khớp với thiết kế frontend ban đầu: bg-military-red --}}
+    {{-- 2. TÌM KIẾM BÀI VIẾT --}}
     <div class="p-6 bg-military-red text-white shadow-lg">
-        <h3 class="text-xl font-serif font-bold mb-2">Bản Tin Quân Sự</h3>
-        <p class="text-sm text-red-100 mb-4 font-light">Nhận phân tích chiến lược hàng tuần vào email của bạn.</p>
-        <form action="#" method="POST" class="space-y-3">
-            <input type="email" placeholder="Email của bạn" required class="w-full p-3 text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 transition">
+        <h3 class="text-xl font-serif font-bold mb-2">Tìm Kiếm</h3>
+        <p class="text-sm text-red-100 mb-4 font-light">Tìm kiếm bài viết theo từ khóa trong tiêu đề.</p>
+        <form action="{{ route('search') }}" method="GET" class="space-y-3">
+            <input type="text" name="q" placeholder="Nhập từ khóa..." required class="w-full p-3 text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 transition" value="{{ request('q') }}">
             {{-- Nút có màu tương phản --}}
-            <button type="submit" class="w-full bg-slate-900 hover:bg-black text-white py-2 text-xs font-bold uppercase tracking-widest transition">
-                Đăng Ký Ngay
+            <button type="submit" class="w-full bg-slate-900 hover:bg-black text-white py-2 text-xs font-bold uppercase tracking-widest transition flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                Tìm Kiếm
             </button>
         </form>
     </div>
     
-    {{-- 3. ẢNH/TWEET (GALLERY) --}}
+    {{-- 3. VIDEO ĐƠN VỊ --}}
     <div class="p-4 bg-white border border-gray-200 shadow-sm">
-        <h3 class="text-xl font-serif font-bold text-gray-900 mb-4 uppercase border-b border-gray-200 pb-2">Góc ảnh</h3>
-        <div class="grid grid-cols-3 gap-1">
-            {{-- Đây là một ví dụ về bố cục Gallery, tôi chia nhỏ các ảnh thành 3 cột --}}
-            <a href="#" class="block overflow-hidden aspect-square hover:opacity-80 transition"><img src="https://picsum.photos/300/300?grayscale&random=11" alt="Ảnh 1" class="w-full h-full object-cover"></a>
-            <a href="#" class="block overflow-hidden aspect-square hover:opacity-80 transition"><img src="https://picsum.photos/300/300?grayscale&random=12" alt="Ảnh 2" class="w-full h-full object-cover"></a>
-            <a href="#" class="block overflow-hidden aspect-square hover:opacity-80 transition"><img src="https://picsum.photos/300/300?grayscale&random=13" alt="Ảnh 3" class="w-full h-full object-cover"></a>
-            <a href="#" class="block overflow-hidden aspect-square hover:opacity-80 transition"><img src="https://picsum.photos/300/300?grayscale&random=14" alt="Ảnh 4" class="w-full h-full object-cover"></a>
-            <a href="#" class="block overflow-hidden aspect-square hover:opacity-80 transition"><img src="https://picsum.photos/300/300?grayscale&random=15" alt="Ảnh 5" class="w-full h-full object-cover"></a>
-            <a href="#" class="block overflow-hidden aspect-square hover:opacity-80 transition"><img src="https://picsum.photos/300/300?grayscale&random=16" alt="Ảnh 6" class="w-full h-full object-cover"></a>
+        <h3 class="text-xl font-serif font-bold text-gray-900 mb-4 uppercase border-b border-gray-200 pb-2">Video đơn vị</h3>
+        <div class="aspect-video">
+            <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/nJwm7z7a6Ik"
+                title="YouTube video player"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen>
+            </iframe>
         </div>
     </div>
     

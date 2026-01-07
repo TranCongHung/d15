@@ -7,6 +7,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SocialAuthController;
 use App\Models\Article;
 use App\Http\Controllers\ArticleController;
 
@@ -20,7 +22,14 @@ use App\Http\Controllers\ArticleController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Tìm kiếm
-Route::get('/search', [HomeController::class, 'search'])->name('search');
+Route::get('/search', [SearchController::class, 'search'])->name('search');
+
+// Social Login Routes
+Route::get('/auth/facebook', [SocialAuthController::class, 'redirectToFacebook'])->name('auth.facebook');
+Route::get('/auth/facebook/callback', [SocialAuthController::class, 'handleFacebookCallback']);
+
+Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 
 
 // Comments routes
