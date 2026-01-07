@@ -1,4 +1,4 @@
-<header class="bg-white font-sans shadow-sm relative z-50">
+<header class="bg-white font-sans shadow-sm sticky top-0 z-50">
     {{-- 1. TOP BAR --}}
     <div class="bg-slate-900 text-slate-300 text-xs py-2">
         <div class="container mx-auto px-4 flex justify-between items-center">
@@ -10,7 +10,7 @@
             
             <div class="flex items-center gap-4 ml-auto md:ml-0">
                 {{-- Music Player Button --}}
-                <button id="music-toggle" onclick="toggleMusic()" class="flex items-center gap-1 hover:text-white transition-colors cursor-pointer" title="Bật/Tắt nhạc nền">
+                <button id="music-toggle" onclick="openMusicPlayer()" class="flex items-center gap-1 hover:text-white transition-colors cursor-pointer" title="Mở trình phát nhạc">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                     </svg>
@@ -71,7 +71,7 @@
     </div>
 
 {{-- 3. NAVIGATION MENU --}}
-<nav class="bg-[#880000] sticky top-0 z-40 shadow-md">
+<nav class="bg-[#880000] shadow-md">
     <div class="container mx-auto px-4">
 
         @php
@@ -152,7 +152,91 @@
         </ul>
     </div>
 </nav>
- 
+
+{{-- MUSIC PLAYER MODAL --}}
+<div id="music-player-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-900/95 backdrop-blur-sm">
+    <div class="relative w-full max-w-2xl bg-white shadow-2xl overflow-hidden min-h-[600px] rounded-sm">
+
+        {{-- Close Button --}}
+        <button onclick="closeMusicPlayer()" class="absolute top-4 right-4 z-10 text-gray-400 hover:text-military-red">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+
+        {{-- Header --}}
+        <div class="bg-military-red text-white p-6">
+            <h2 class="text-2xl font-serif font-bold uppercase tracking-wider text-center">
+                🎵 TRÌNH PHÁT NHẠC QUÂN ĐỘI
+            </h2>
+            <p class="text-center text-sm mt-2 opacity-90">15 Bài Hát Chủ Đề Quân Sự - Quốc Phòng</p>
+        </div>
+
+        {{-- Main Content --}}
+        <div class="flex flex-col md:flex-row h-[500px]">
+
+            {{-- Left Side: Now Playing --}}
+            <div class="md:w-1/2 p-6 bg-slate-50 flex flex-col justify-center items-center">
+                {{-- YouTube Player Embed --}}
+                <div class="w-full max-w-sm mb-6">
+                    <div id="youtube-player" class="aspect-video bg-black rounded-lg overflow-hidden shadow-lg">
+                        <!-- YouTube iframe will be inserted here by YouTube API -->
+                    </div>
+                </div>
+
+                <div class="text-center mb-4">
+                    <h3 id="current-song-title" class="text-xl font-serif font-bold text-gray-900 mb-1">Quốc tế ca</h3>
+                    <p id="current-song-artist" class="text-sm text-military-red font-medium">Nhạc Cách Mạng</p>
+                    <p id="current-song-category" class="text-xs text-gray-500 mt-1">Quốc Tế</p>
+                </div>
+
+                {{-- Controls --}}
+                <div class="flex items-center gap-4 mb-4">
+                    <button id="prev-btn" onclick="playPrevious()" class="p-3 text-military-red hover:text-white hover:bg-military-red rounded-full transition-colors" title="Bài trước">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+
+                    <button id="play-pause-btn" onclick="togglePlayPause()" class="p-4 bg-military-red text-white rounded-full hover:bg-red-800 transition-colors shadow-lg">
+                        <svg id="play-icon" class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <svg id="pause-icon" class="w-8 h-8 hidden" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                        </svg>
+                    </button>
+
+                    <button id="next-btn" onclick="playNext()" class="p-3 text-military-red hover:text-white hover:bg-military-red rounded-full transition-colors" title="Bài tiếp">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Song Counter --}}
+                <div class="text-center text-sm text-gray-600">
+                    <span id="current-song-number">1</span> / 15 bài hát
+                </div>
+            </div>
+
+            {{-- Right Side: Playlist --}}
+            <div class="md:w-1/2 p-6 bg-white border-l border-gray-100">
+                <h3 class="text-lg font-serif font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-military-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    DANH SÁCH PHÁT (15 BÀI)
+                </h3>
+
+                <div class="space-y-2 max-h-80 overflow-y-auto">
+                    {{-- Song List will be populated by JavaScript --}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 </header>
 
 {{-- AUTH MODAL --}}
